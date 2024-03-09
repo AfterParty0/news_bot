@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "news-bot"
+version = "0.1.0"
+description = ""
+authors = ["Afterparty <smirnovpetr761@gmail.com>"]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+python-telegram-bot = "^21.0.1"
+pydantic = "^2.6.3"
+pydantic-settings = "^2.2.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.2.0"
+pylint = "^3.1.0"
+flake8 = "^7.0.0"
+ruff = "^0.3.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
