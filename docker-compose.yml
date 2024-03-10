@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7.2.4
+    command: redis-server --save "" --appendonly no
+    container_name: redis
+    environment:
+      REDIS_PORT: 6379
+      REDIS_DATABASES: 16
+      REDIS_REPLICATION_MODE: master
+    volumes:
+      - ./pv/redis/data:/data
+    restart: always
+    ports:
+      - "6379:6379"
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - 8888:8081
