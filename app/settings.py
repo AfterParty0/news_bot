@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     TG_BOT_TOKEN: str
     NEWS_API_URL: str
     NEWS_API_KEY: str
+    REDIS_URL: str
 
     class Config:
         env_file = ".env"

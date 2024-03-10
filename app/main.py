@@ -3,8 +3,9 @@ from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     CallbackQuery,
-    error
+    error,
 )
+import redis.asyncio as aioredis
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -16,18 +17,43 @@ from app.keyboard_builder import generate_keyboard
 import json
 
 from utils import CurrenciesService
+from utils import NewsService
 
-cs = CurrenciesService('r6dtufctrc')
+redis = aioredis.from_url(
+    settings.REDIS_URL,
+    encoding="utf-8",
+    decode_responses=True,
+)
 
-async def prepare_currencies(currencies: list[dict]) -> str:
-    msg = 'currencies: \n\n'
-    
+cs = CurrenciesService("r6dtufctrc")
+ns = NewsService("ihgfiuwqhg", "ihfoihe")
+
+
+async def prepare_news(
+    currencies: list[dict],
+) -> str:
+    msg = "news: \n\n"
+
     for currency in currencies:
-        value = currency.get('Value')
-        name = currency.get('CharCode')
-        msg += f'{name}: {round(value,2)} RUB \n'
-        
+        title = currency.get("title")
+        description = currency.get("description")
+        msg += f"{title}\n\n{description}\n\n\n"
+
     return msg
+
+
+async def prepare_currencies(
+    news: list[dict],
+) -> str:
+    msg = "currencies: \n\n"
+
+    for news in news:
+        value = news.get("Value")
+        name = news.get("CharCode")
+        msg += f"{name}: {round(value,2)} RUB \n"
+
+    return msg
+
 
 async def command_start(
     update: Update,
@@ -56,27 +82,31 @@ async def command_currencies(
 async def callback_news(
     query: CallbackQuery,
 ) -> None:
-    try: 
-        await query.edit_message_text(
-            "news",
-            reply_markup=await generate_keyboard(),
-        )
-    except error.BadRequest:
-        pass
-
-async def callback_currencies(
-    query: CallbackQuery,
-) -> None:
-    try: 
-        raw_currencies = await cs.get_currencies()
-        msg = await prepare_currencies(raw_currencies)
+    try:
+        raw_news = await ns.get_news(redis)
+        msg = await prepare_news(raw_news)
         await query.edit_message_text(
             msg,
             reply_markup=await generate_keyboard(),
         )
     except error.BadRequest:
         pass
-    
+
+
+async def callback_currencies(
+    query: CallbackQuery,
+) -> None:
+    try:
+        raw_currencies = await cs.get_currencies(redis)
+        msg = await prepare_currencies(
+            raw_currencies
+        )
+        await query.edit_message_text(
+            msg,
+            reply_markup=await generate_keyboard(),
+        )
+    except error.BadRequest:
+        pass
 
 
 async def callbacks(

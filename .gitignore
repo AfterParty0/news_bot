@@ -100,3 +100,5 @@ dmypy.json
 .pyre/
 .pytype/
 cython_debug/
+apiNews.json
+apiCurrencies.json

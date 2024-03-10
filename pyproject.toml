@@ -11,6 +11,7 @@ python = "^3.11"
 python-telegram-bot = "^21.0.1"
 pydantic = "^2.6.3"
 pydantic-settings = "^2.2.1"
+redis = "^5.0.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
